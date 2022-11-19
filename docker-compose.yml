@@ -1,0 +1,44 @@
+version: '3.9'
+
+x-base_service: &base_service
+    volumes:
+      - ./content:/content
+      - ./models:/models
+      - ./convertModels:/convertModels
+      - ./cache:/root/.cache
+      - ./train:/train
+    deploy:
+      resources:
+        reservations:
+          devices:
+              - driver: nvidia
+                device_ids: ['0']
+                capabilities: [gpu]
+                
+services:
+  build:
+    <<: *base_service
+    build: 
+      context: ./
+      target: build
+    volumes:
+      - ./build/output:/output
+    profiles:
+      - build
+
+  cli:
+    <<: *base_service
+    build: 
+      context: ./
+      target: cli
+    profiles:
+      - cli
+    tty: true
+
+  notebook:
+    <<: *base_service
+    build: 
+      context: ./
+      target: notebook
+    ports:
+      - 8888:8888
