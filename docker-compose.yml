@@ -42,3 +42,5 @@ services:
       target: notebook
     ports:
       - 8888:8888
+    profiles:
+      - notebook
